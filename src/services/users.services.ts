@@ -4,6 +4,10 @@ import { RegisterRequestBody } from '~/models/Request/User.request'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import { TokenType } from '~/constants/enum'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
+import { ObjectId } from 'mongodb'
+import { config } from 'dotenv'
+config()
 
 class UsersServices {
   // Tạo access token cho user
@@ -22,6 +26,10 @@ class UsersServices {
     })
   }
 
+  private signAccessTokenAndRefreshToken(user_id: string) {
+    return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
+  }
+  // Đăng ký user với password đã hash
   async register(payload: RegisterRequestBody) {
     const result = await databaseService.users.insertOne(
       new User({
@@ -31,19 +39,34 @@ class UsersServices {
       })
     )
     const user_id = result.insertedId.toString()
-    const [accessToken, refreshToken] = await Promise.all([
-      this.signAccessToken(user_id),
-      this.signRefreshToken(user_id)
-    ])
+
+    const [access_token, refresh_token] = await this.signAccessTokenAndRefreshToken(user_id)
+    // Lưu refresh token vào trong database
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+    )
+
     return {
-      accessToken,
-      refreshToken
+      access_token,
+      refresh_token
     }
   }
   // Kiểm tra email có tồn tại hay không
   async checkEmailExist(email: string) {
     const user = await databaseService.users.findOne({ email })
     return Boolean(user)
+  }
+
+  // Kiểm tra người dùng có tồn tại hay không
+  async login(user_id: string) {
+    const [access_token, refresh_token] = await this.signAccessTokenAndRefreshToken(user_id)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+    )
+    return {
+      access_token,
+      refresh_token
+    }
   }
 }
 
