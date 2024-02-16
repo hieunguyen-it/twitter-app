@@ -40,6 +40,14 @@ class UsersServices {
   private signAccessTokenAndRefreshToken(user_id: string) {
     return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
   }
+
+  private signForgotPasswordToken(user_id: string) {
+    return signToken({
+      payload: { user_id, token_type: TokenType.ForgotPasswordToken },
+      privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string,
+      options: { expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRE_IN }
+    })
+  }
   // Đăng ký user với password đã hash
   async register(payload: RegisterRequestBody) {
     const user_id = new ObjectId()
@@ -132,6 +140,35 @@ class UsersServices {
     )
     return {
       message: USERS_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESS
+    }
+  }
+
+  async forgotPassword(user_id: string) {
+    /*
+     *  Lấy user_id từ controller
+     * Xử lý logic hàm signForgotPasswordToken để lấy ra forgot_password_token
+     */
+    const forgot_password_token = await this.signForgotPasswordToken(user_id)
+    /*
+     * Tiến hành cập nhật forgot_password_token trong document user
+     */
+    await databaseService.users.updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: { forgot_password_token },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+    /*
+     * Gửi email kèm đường link đến email người dùng: https://twitter.com/forgotpassword?token=token
+     */
+    console.log('forgot_password_token', forgot_password_token)
+    return {
+      message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD
     }
   }
 }
