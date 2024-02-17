@@ -6,8 +6,10 @@ import {
   LoginRequestBody,
   LogoutRequestBody,
   RegisterRequestBody,
+  ResetPasswordRequestBody,
   TokenPayload,
-  VerifyEmailRequestBody
+  VerifyEmailRequestBody,
+  VerifyForgotPasswordRequestBody
 } from '~/models/Request/User.request'
 import { ObjectId } from 'mongodb'
 import User from '~/models/schemas/User.schema'
@@ -100,5 +102,26 @@ export const forgotPasswordController = async (
 ) => {
   const { _id } = req.user as User
   const result = await usersServices.forgotPassword((_id as ObjectId).toString())
+  return res.json(result)
+}
+
+export const verifyForgotPasswordController = async (
+  req: Request<ParamsDictionary, any, VerifyForgotPasswordRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  return res.json({
+    messsage: USERS_MESSAGES.VERIFY_FORGOT_PASSWORD_SUCCESS
+  })
+}
+
+export const resetPasswordController = async (
+  req: Request<ParamsDictionary, any, ResetPasswordRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_forgot_password_token as TokenPayload
+  const { password } = req.body
+  const result = await usersServices.resetPassword(user_id, password)
   return res.json(result)
 }

@@ -19,6 +19,12 @@ export interface RegisterRequestBody {
 export interface LogoutRequestBody {
   refresh_token: string
 }
+
+export interface ResetPasswordRequestBody {
+  password: string
+  confirm_password: string
+  forgot_password_token: string
+}
 export interface TokenPayload extends JwtPayload {
   user_id: string
   token_type: TokenType
@@ -26,4 +32,7 @@ export interface TokenPayload extends JwtPayload {
 
 export interface ForgotPasswordRequestBody {
   email: string
+}
+export interface VerifyForgotPasswordRequestBody {
+  forgot_password_token: string
 }
