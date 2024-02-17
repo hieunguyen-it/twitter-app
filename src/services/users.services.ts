@@ -125,6 +125,7 @@ class UsersServices {
 
   async resendVerifyEmail(user_id: string) {
     const email_verify_token = await this.signEmailVerifyToken(user_id)
+    console.log('email_verify_token', email_verify_token)
 
     // Cập nhật lại giát trị email_verify_token trong document user
     await databaseService.users.updateOne(
@@ -183,6 +184,21 @@ class UsersServices {
     return {
       message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS
     }
+  }
+
+  async getMe(user_id: string) {
+    const user = await databaseService.users.findOne(
+      { _id: new ObjectId(user_id) },
+      // Không muốn trả về password
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0
+        }
+      }
+    )
+    return user
   }
 }
 
