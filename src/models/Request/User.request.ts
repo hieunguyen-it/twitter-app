@@ -44,6 +44,14 @@ export interface UpdateMeReqBody {
   cover_photo?: string
 }
 
+export interface FollowUserReqBody {
+  followed_user_id: string
+}
+
+export interface GetProfileReqParams {
+  username: string
+}
+
 export interface ForgotPasswordRequestBody {
   email: string
 }
