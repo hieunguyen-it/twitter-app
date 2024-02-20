@@ -4,7 +4,7 @@ import databaseService from './services/database.services'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 databaseService.connect()
 const app = express()
-const port = 3000
+const port = 4000
 
 app.use(express.json())
 app.use('/user', usersRouter)
@@ -12,5 +12,5 @@ app.use('/user', usersRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {
-  console.log('Example app listening on port 3000!')
+  console.log('Example app listening on port 4000!')
 })
