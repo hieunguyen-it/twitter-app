@@ -60,6 +60,7 @@ usersRouter.get('/oauth/google', wrapRequestHandler(oauthController))
  * Body: {name: string, email:string, password: string, date_of_birth: Date, confirm_password: string}
  */
 usersRouter.post('/register', registerValidator, wrapRequestHandler(registerController))
+
 /**
  * Description: Logout a user
  * Path: /logout
