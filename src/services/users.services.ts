@@ -2,7 +2,7 @@ import User from '~/models/schemas/User.schema'
 import databaseService from './database.services'
 import { RegisterRequestBody, UpdateMeReqBody } from '~/models/Request/User.request'
 import { hashPassword } from '~/utils/crypto'
-import { signToken } from '~/utils/jwt'
+import { signToken, verifyToken } from '~/utils/jwt'
 import { TokenType, UserVerifyStatus } from '~/constants/enum'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
@@ -193,6 +193,29 @@ class UsersServices {
       message: USERS_MESSAGES.LOGOUT_SUCCESS
     }
   }
+
+  async refreshToken({
+    user_id,
+    verify,
+    refresh_token,
+    exp
+  }: {
+    user_id: string
+    verify: UserVerifyStatus
+    refresh_token: string
+    exp: number
+  }) {
+    const [new_access_token, new_refresh_token] = await Promise.all([
+      this.signAccessToken({ user_id, verify }),
+      this.signRefreshToken({ user_id, verify }),
+      databaseService.refreshTokens.deleteOne({ token: refresh_token })
+    ])
+    return {
+      access_token: new_access_token,
+      refresh_token: new_refresh_token
+    }
+  }
+
   // Verify email
   async verifyEmail(user_id: string) {
     // Tạo giá trị cập nhật: dùng new Date() -> Thời điểm xảy ra trước
