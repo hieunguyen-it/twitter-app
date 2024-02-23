@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import formidable, { File } from 'formidable'
 import fs from 'fs'
+import path from 'path'
 import { UPLOAD_IMAGE_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_TEMP_DIR } from '~/constants/dir'
 
 export const initFolder = () => {
@@ -49,11 +50,23 @@ export const handleUploadImage = async (req: Request) => {
   })
 }
 
+// Cách xử lý khi upload video và encode
+// Có 2 giai đoạn
+// Upload video: Upload video thành công thì resolve về cho người dùng
+// Encode video: Khai báo thêm 1 url endpoint để check xem cái video đó đã encode xong chưa
+
 export const handleUploadVideo = async (req: Request) => {
-  // path.resolve('uploads'): Khi upload file, tạo thư mục uploads trong thư mục root
-  // keepExtensions file mở rộng
+  // Cách để có được định dạng idname/idname.mp4
+  // ✅Cách 1: Tạo unique id cho video ngay từ đầu
+  // ❌Cách 2: Đợi video upload xong rồi tạo folder, move video vào
+
+  const nanoId = (await import('nanoid')).nanoid
+  const idName = nanoId()
+
+  const folderPath = path.resolve(UPLOAD_VIDEO_DIR, idName)
+  fs.mkdirSync(folderPath)
   const form = formidable({
-    uploadDir: UPLOAD_VIDEO_DIR,
+    uploadDir: folderPath,
     maxFiles: 1,
     keepExtensions: true,
     maxFileSize: 50 * 1024 * 1024, // 50mb
@@ -63,6 +76,9 @@ export const handleUploadVideo = async (req: Request) => {
         form.emit('error' as any, new Error('File type is not valid') as any)
       }
       return valid
+    },
+    filename: function (ext) {
+      return idName
     }
   })
 
@@ -83,6 +99,14 @@ export const handleUploadVideo = async (req: Request) => {
 export const getNameFromFullname = (fullname: string) => {
   const namearr = fullname.split('.')
   namearr.pop()
-
   return namearr.join('')
+}
+
+export const getNameVideoHLSPath = (path: string) => {
+  const pathArray = path.split('/')
+
+  // Lấy phần tử cuối cùng trong mảng, đó chính là chuỗi cần tìm
+  const lastElement = pathArray[pathArray.length - 1]
+
+  return lastElement
 }
