@@ -16,6 +16,7 @@ class DatabaseService {
     this.db = this.client.db(process.env.DB_NAME)
   }
 
+  // Kết nối database
   async connect() {
     try {
       // Send a ping to confirm a successful connection
@@ -34,7 +35,7 @@ class DatabaseService {
 
   async indexUser() {
     const exists = await this.users.indexExists(['email_1_password_1', 'username_1', 'email_1'])
-
+    // Tạo index cho collection Users
     if (!exists) {
       this.users.createIndex({ email: 1, password: 1 })
       this.users.createIndex({ email: 1 }, { unique: true })
@@ -47,7 +48,7 @@ class DatabaseService {
   // và gán với expireAfterSeconds: 0 (Nghĩa là với exp đã hết hạn theo date hệ thống thì mongodb sẽ dựa vào exp để xóa tự động bản ghi đó đi vì nó không còn giá trị nữa)
   async indexRefreshTokens() {
     const exists = await this.users.indexExists(['exp_1', 'token_1'])
-
+    // Tạo index cho collection RefreshTokens
     if (!exists) {
       this.refreshTokens.createIndex({ token: 1 })
       this.refreshTokens.createIndex(
@@ -61,6 +62,7 @@ class DatabaseService {
 
   async indexVideoStatus() {
     const exists = await this.users.indexExists(['name_1'])
+    // Tạo index cho collection VideoStatus
     if (!exists) {
       this.videoStatus.createIndex({ name: 1 })
     }
@@ -68,6 +70,7 @@ class DatabaseService {
 
   async indexFollowers() {
     const exists = await this.users.indexExists(['user_id_1_followed_user_id_1'])
+    // Tạo index cho collection Follower
     if (!exists) {
       this.followers.createIndex({ user_id: 1, followed_user_id: 1 }, { unique: true })
     }
