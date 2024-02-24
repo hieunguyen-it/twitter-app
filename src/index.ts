@@ -9,6 +9,7 @@ import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir'
 import staticRouter from './routes/static.routes'
 import cors from 'cors'
 import tweetsRouter from './routes/tweet.routes'
+import bookmarksRouter from './routes/bookmarks.routes'
 config()
 
 databaseService.connect().then(() => {
@@ -27,6 +28,7 @@ initFolder()
 app.use(express.json())
 app.use('/user', usersRouter)
 app.use('/medias', mediasRouter)
+app.use('/bookmarks', bookmarksRouter)
 
 /* Ưu điểm việc sử dụng router để serving 1 static file thì
   nó có khả năng custom sâu hơn, ví dụ: trả ra lỗi cụ thể hơn khi dùng 
