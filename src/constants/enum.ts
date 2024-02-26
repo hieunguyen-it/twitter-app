@@ -11,6 +11,11 @@ export enum TokenType {
   EmailVerifyToken
 }
 
+export enum MediaTypeQuery {
+  Image = 'image',
+  Video = 'video'
+}
+
 export enum MediaType {
   Image,
   Video,
@@ -33,4 +38,9 @@ export enum TweetType {
   Retweet,
   Comment,
   QuoteTweet
+}
+
+export enum PeopleFollow {
+  Anyone = '0',
+  Following = '1'
 }

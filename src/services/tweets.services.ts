@@ -56,7 +56,11 @@ class TweetsServices {
         }
       }
     )
-    return result
+    return result as {
+      guest_views: number
+      user_views: number
+      updated_at: Date
+    }
   }
 }
 

@@ -126,9 +126,119 @@ export const tweetIdValidator = validate(
                 message: TWEETS_MESSAGES.INVALID_TWEET_ID
               })
             }
-            const tweet = await databaseService.tweets.findOne({
-              _id: new ObjectId(value)
-            })
+            const [tweet] = await databaseService.tweets
+              .aggregate<Tweet>([
+                {
+                  $match: {
+                    _id: new ObjectId(value)
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'hashtags',
+                    localField: 'hashtags',
+                    foreignField: '_id',
+                    as: 'hashtags'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'users',
+                    localField: 'mentions',
+                    foreignField: '_id',
+                    as: 'mentions'
+                  }
+                },
+                {
+                  $addFields: {
+                    mentions: {
+                      $map: {
+                        input: '$mentions',
+                        as: 'mention',
+                        in: {
+                          _id: '$$mention._id',
+                          name: '$$mention.name',
+                          username: '$$mention.username',
+                          email: '$$mention.email'
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'bookmarks',
+                    localField: '_id',
+                    foreignField: 'tweet_id',
+                    as: 'bookmarks'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'tweet_id',
+                    as: 'likes'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'tweets',
+                    localField: '_id',
+                    foreignField: 'parent_id',
+                    as: 'tweet_children'
+                  }
+                },
+                {
+                  $addFields: {
+                    bookmarks: {
+                      $size: '$bookmarks'
+                    },
+                    likes: {
+                      $size: '$likes'
+                    },
+                    retweet_count: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_children',
+                          as: 'item',
+                          cond: {
+                            $eq: ['$$item.type', TweetType.Retweet]
+                          }
+                        }
+                      }
+                    },
+                    comment_count: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_children',
+                          as: 'item',
+                          cond: {
+                            $eq: ['$$item.type', TweetType.Comment]
+                          }
+                        }
+                      }
+                    },
+                    quote_count: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_children',
+                          as: 'item',
+                          cond: {
+                            $eq: ['$$item.type', TweetType.QuoteTweet]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  $project: {
+                    tweet_children: 0
+                  }
+                }
+              ])
+              .toArray()
             if (!tweet) {
               throw new ErrorWithStatus({
                 status: HTTP_STATUS.NOT_FOUND,
@@ -182,3 +292,35 @@ export const audienceValidator = wrapRequestHandler(async (req: Request, res: Re
   }
   next()
 })
+
+export const paginationValidator = validate(
+  checkSchema(
+    {
+      limit: {
+        isNumeric: true,
+        custom: {
+          options: async (value, { req }) => {
+            const num = Number(value)
+            if (num > 100 || num < 1) {
+              throw new Error('1 <= limit <= 100')
+            }
+            return true
+          }
+        }
+      },
+      page: {
+        isNumeric: true,
+        custom: {
+          options: async (value, { req }) => {
+            const num = Number(value)
+            if (num < 1) {
+              throw new Error('page >= 1')
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['query']
+  )
+)

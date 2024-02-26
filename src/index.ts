@@ -5,11 +5,12 @@ import { defaultErrorHandler } from './middlewares/error.middlewares'
 import mediasRouter from './routes/medias.routes'
 import { initFolder } from './utils/file'
 import { config } from 'dotenv'
-import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from './constants/dir'
+import { UPLOAD_VIDEO_DIR } from './constants/dir'
 import staticRouter from './routes/static.routes'
 import cors from 'cors'
 import tweetsRouter from './routes/tweet.routes'
 import bookmarksRouter from './routes/bookmarks.routes'
+import searchRouter from './routes/search.routes'
 config()
 
 databaseService.connect().then(() => {
@@ -29,6 +30,7 @@ app.use(express.json())
 app.use('/user', usersRouter)
 app.use('/medias', mediasRouter)
 app.use('/bookmarks', bookmarksRouter)
+app.use('/search', searchRouter)
 
 /* Ưu điểm việc sử dụng router để serving 1 static file thì
   nó có khả năng custom sâu hơn, ví dụ: trả ra lỗi cụ thể hơn khi dùng 
