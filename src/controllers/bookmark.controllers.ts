@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { BOOKMARK_MESSAGES } from '~/constants/messages'
-import { BookmarkTweetRequestBody } from '~/models/Request/Bookmark.request'
-import { TokenPayload } from '~/models/Request/User.request'
+import { BookmarkTweetRequestBody } from '~/models/Request/Bookmark.requests'
+import { TokenPayload } from '~/models/Request/User.requests'
 import bookmarksServices from '~/services/bookmarks.services'
 
 export const bookmarkTweetController = async (

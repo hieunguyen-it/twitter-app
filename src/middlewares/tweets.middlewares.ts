@@ -6,7 +6,7 @@ import { MediaType, TweetAudience, TweetType, UserVerifyStatus } from '~/constan
 import HTTP_STATUS from '~/constants/httpStatus'
 import { TWEETS_MESSAGES, USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
-import { TokenPayload } from '~/models/Request/User.request'
+import { TokenPayload } from '~/models/Request/User.requests'
 import Tweet from '~/models/schemas/Tweet.schema'
 import databaseService from '~/services/database.services'
 import { numberEnumToArray } from '~/utils/common'

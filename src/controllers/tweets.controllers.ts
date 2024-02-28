@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { TWEETS_MESSAGES } from '~/constants/messages'
-import { TweetRequestBody } from '~/models/Request/Tweet.request'
-import { TokenPayload } from '~/models/Request/User.request'
+import { TweetRequestBody } from '~/models/Request/Tweet.requests'
+import { TokenPayload } from '~/models/Request/User.requests'
 import tweetsServices from '~/services/tweets.services'
 
 export const createTweetController = async (req: Request<ParamsDictionary, any, TweetRequestBody>, res: Response) => {

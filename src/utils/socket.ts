@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { verifyAccessToken } from '~/utils/common'
-import { TokenPayload } from '~/models/Request/User.request'
+import { TokenPayload } from '~/models/Request/User.requests'
 import { UserVerifyStatus } from '~/constants/enum'
 import { ErrorWithStatus } from '~/models/Errors'
 import { USERS_MESSAGES } from '~/constants/messages'

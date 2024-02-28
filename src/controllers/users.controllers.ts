@@ -16,7 +16,7 @@ import {
   UpdateMeReqBody,
   VerifyEmailRequestBody,
   VerifyForgotPasswordRequestBody
-} from '~/models/Request/User.request'
+} from '~/models/Request/User.requests'
 import { ObjectId } from 'mongodb'
 import User from '~/models/schemas/User.schema'
 import { USERS_MESSAGES } from '~/constants/messages'

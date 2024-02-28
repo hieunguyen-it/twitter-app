@@ -1,20 +1,57 @@
-import express from 'express'
-import usersRouter from './routes/users.routes'
-import databaseService from './services/database.services'
-import { defaultErrorHandler } from './middlewares/error.middlewares'
-import mediasRouter from './routes/medias.routes'
-import { initFolder } from './utils/file'
-import { config } from 'dotenv'
-import { UPLOAD_VIDEO_DIR } from './constants/dir'
-import staticRouter from './routes/static.routes'
+// import fs from 'fs'
 import cors from 'cors'
-import tweetsRouter from './routes/tweet.routes'
-import bookmarksRouter from './routes/bookmarks.routes'
-import searchRouter from './routes/search.routes'
+import YAML from 'yaml'
+// import path from 'path'
+import express from 'express'
+import { config } from 'dotenv'
 import { createServer } from 'http'
-
-import conversationsRouter from './routes/conversations.routes'
+import swaggerJsdoc from 'swagger-jsdoc'
 import initSocket from './utils/socket'
+import swaggerUi from 'swagger-ui-express'
+import { initFolder } from './utils/file'
+import usersRouter from './routes/users.routes'
+import tweetsRouter from './routes/tweet.routes'
+import staticRouter from './routes/static.routes'
+import mediasRouter from './routes/medias.routes'
+import searchRouter from './routes/search.routes'
+import { UPLOAD_VIDEO_DIR } from './constants/dir'
+import bookmarksRouter from './routes/bookmarks.routes'
+import databaseService from './services/database.services'
+import conversationsRouter from './routes/conversations.routes'
+import { defaultErrorHandler } from './middlewares/error.middlewares'
+
+// const file = fs.readFileSync(path.resolve('twitter-swagger.yaml'), 'utf8')
+// const swaggerDocument = YAML.parse(file)
+
+const options: swaggerJsdoc.Options = {
+  // definition: {
+  //   openapi: '3.0.0',
+  //   info: {
+  //     title: 'X clone (Twitter API)',
+  //     version: '1.0.0'
+  //   },
+  //   // Khai báo mở rộng để có thêm option Authorize trên swagger
+  //   components: {
+  //     securitySchemes: {
+  //       BearerAuth: {
+  //         type: 'http',
+  //         scheme: 'bearer',
+  //         bearerFormat: 'JWT'
+  //       }
+  //     }
+  //   }
+  // },
+  // apis: ['./src/routes/*.routes.ts', './src/models/Request/*.requests.ts']
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'X clone (Twitter API)',
+      version: '1.0.0'
+    }
+  },
+  apis: ['./openapi/*.yaml']
+}
+const openapiSpecification = swaggerJsdoc(options)
 
 config()
 
@@ -33,6 +70,7 @@ const port = process.env.PORT || 4000
 initFolder()
 
 app.use(express.json())
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
 app.use('/user', usersRouter)
 app.use('/medias', mediasRouter)
 app.use('/bookmarks', bookmarksRouter)

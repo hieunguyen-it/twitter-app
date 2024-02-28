@@ -1,4 +1,4 @@
-import { TweetRequestBody } from '~/models/Request/Tweet.request'
+import { TweetRequestBody } from '~/models/Request/Tweet.requests'
 import databaseService from './database.services'
 import Tweet from '~/models/schemas/Tweet.schema'
 import { ObjectId, WithId } from 'mongodb'

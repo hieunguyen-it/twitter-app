@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { User } from '~/models/schemas/User.schema'
-import { TokenPayload } from './models/Request/User.request'
+import { TokenPayload } from './models/Request/User.requests'
 
 // Bổ sung thêm kiểu dữ liệu cho Interface Request
 declare module 'express' {
