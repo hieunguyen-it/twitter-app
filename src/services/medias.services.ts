@@ -3,15 +3,13 @@ import { getNameFromFullname, getNameVideoHLSPath, handleUploadImage, handleUplo
 import sharp from 'sharp'
 import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
 import fs from 'fs'
-import { isProduction } from '~/constants/config'
-import { config } from 'dotenv'
+import { envConfig, isProduction } from '~/constants/config'
 import { EncodingStatus, MediaType } from '~/constants/enum'
 import { Media } from '~/models/Other'
 import { encodeHLSWithMultipleVideoStreams } from '~/utils/video'
 import fsPromise from 'fs/promises'
 import databaseService from './database.services'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
-config()
 
 class Queue {
   items: string[]
@@ -114,8 +112,8 @@ class MediasServices {
 
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/image/${newName}.jpg`
-            : `http://localhost:${process.env.PORT}/static/image/${newName}.jpg`,
+            ? `${envConfig.host}/static/image/${newName}.jpg`
+            : `http://localhost:${envConfig.port}/static/image/${newName}.jpg`,
           type: MediaType.Image
         }
       })
@@ -129,8 +127,8 @@ class MediasServices {
     const result: Media[] = files.map((file) => {
       return {
         url: isProduction
-          ? `${process.env.HOST}/static/video/${file.newFilename}`
-          : `http://localhost:${process.env.PORT}/static/video/${file.newFilename}`,
+          ? `${envConfig.host}/static/video/${file.newFilename}`
+          : `http://localhost:${envConfig.port}/static/video/${file.newFilename}`,
         type: MediaType.Video
       }
     })
@@ -146,8 +144,8 @@ class MediasServices {
         queue.enqueue(file.filepath)
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/video-hls/${file.newFilename}.m3u8`
-            : `http://localhost:${process.env.PORT}/static/video-hls/${file.newFilename}.m3u8`,
+            ? `${envConfig.host}/static/video-hls/${file.newFilename}.m3u8`
+            : `http://localhost:${envConfig.port}/static/video-hls/${file.newFilename}.m3u8`,
           type: MediaType.HLS
         }
       })

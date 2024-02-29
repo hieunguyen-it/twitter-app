@@ -3,7 +3,6 @@ import cors from 'cors'
 import YAML from 'yaml'
 // import path from 'path'
 import express from 'express'
-import { config } from 'dotenv'
 import { createServer } from 'http'
 import swaggerJsdoc from 'swagger-jsdoc'
 import initSocket from './utils/socket'
@@ -19,6 +18,7 @@ import bookmarksRouter from './routes/bookmarks.routes'
 import databaseService from './services/database.services'
 import conversationsRouter from './routes/conversations.routes'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
+import { envConfig } from '~/constants/config'
 
 // const file = fs.readFileSync(path.resolve('twitter-swagger.yaml'), 'utf8')
 // const swaggerDocument = YAML.parse(file)
@@ -53,8 +53,6 @@ const options: swaggerJsdoc.Options = {
 }
 const openapiSpecification = swaggerJsdoc(options)
 
-config()
-
 databaseService.connect().then(() => {
   databaseService.indexUser()
   databaseService.indexRefreshTokens()
@@ -64,7 +62,7 @@ databaseService.connect().then(() => {
 const app = express()
 const httpServer = createServer(app)
 app.use(cors())
-const port = process.env.PORT || 4000
+const port = envConfig.port
 
 // Tạo folder uploads
 initFolder()
@@ -93,5 +91,5 @@ app.use(defaultErrorHandler)
 initSocket(httpServer)
 
 httpServer.listen(port, () => {
-  console.log('Example app listening on port 4000!')
+  console.log(`Example app listening on port ${envConfig.port}!`)
 })
