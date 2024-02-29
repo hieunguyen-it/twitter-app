@@ -1,12 +1,14 @@
 // import fs from 'fs'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
 import YAML from 'yaml'
 // import path from 'path'
+import helmet from 'helmet'
 import express from 'express'
 import { createServer } from 'http'
-import swaggerJsdoc from 'swagger-jsdoc'
 import initSocket from './utils/socket'
+import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+import { rateLimit } from 'express-rate-limit'
 import { initFolder } from './utils/file'
 import usersRouter from './routes/users.routes'
 import tweetsRouter from './routes/tweet.routes'
@@ -18,7 +20,7 @@ import bookmarksRouter from './routes/bookmarks.routes'
 import databaseService from './services/database.services'
 import conversationsRouter from './routes/conversations.routes'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
-import { envConfig } from '~/constants/config'
+import { envConfig, isProduction } from '~/constants/config'
 
 // const file = fs.readFileSync(path.resolve('twitter-swagger.yaml'), 'utf8')
 // const swaggerDocument = YAML.parse(file)
@@ -60,8 +62,31 @@ databaseService.connect().then(() => {
   databaseService.indexFollowers()
 })
 const app = express()
+// Sử dụng express limit để giới hạn lượng request đến sever tránh trường hợp request quá nhiều sẽ bị treo
+/**
+ * windowMs: 15 * 60 * 1000 = 15 phút
+ * limit: 100
+ * ==> Tức là trong 15 phút ip hiện tại truy cập chỉ được gọi tối đa 100 request
+ * */
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+  legacyHeaders: false // Disable the `X-RateLimit-*` headers.
+  // store: ... , // Use an external store for consistency across multiple server instances.
+})
+app.use(limiter)
+
 const httpServer = createServer(app)
-app.use(cors())
+app.use(helmet())
+
+// Nếu là production mới cho trỏ đến tên miền chỉ định
+// Lưu ý nữa là khi test trên Postman nó sẽ skip qua cors chỉ có hiệu quả đối với các trình duyệt
+const corsOptions: CorsOptions = {
+  origin: isProduction ? envConfig.clientUrl : '*'
+}
+app.use(cors(corsOptions))
 const port = envConfig.port
 
 // Tạo folder uploads
