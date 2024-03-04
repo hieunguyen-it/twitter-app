@@ -21,6 +21,7 @@ import databaseService from './services/database.services'
 import conversationsRouter from './routes/conversations.routes'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import { envConfig, isProduction } from '~/constants/config'
+import '~/utils/s3'
 
 // const file = fs.readFileSync(path.resolve('twitter-swagger.yaml'), 'utf8')
 // const swaggerDocument = YAML.parse(file)

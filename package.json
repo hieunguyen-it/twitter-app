@@ -7,7 +7,7 @@
     "dev": "NODE_ENV=development npx nodemon",
     "dev:staging": "NODE_ENV=staging npx nodemon",
     "dev:production": "NODE_ENV=production npx nodemon",
-    "start:dev": "NODE_ENV=development node dist/index.jst",
+    "start:dev": "NODE_ENV=development node dist/index.js",
     "start:staging": "NODE_ENV=staging node dist/index.js",
     "start:production": "NODE_ENV=production node dist/index.js",
     "build": "rimraf ./dist && tsc && tsc-alias",
@@ -45,6 +45,9 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.525.0",
+    "@aws-sdk/client-ses": "^3.525.0",
+    "@aws-sdk/lib-storage": "^3.525.1",
     "axios": "^1.6.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
